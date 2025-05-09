@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Vårkamp</title>
+
+  <!-- PWA‑manifest & ikon -->
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon-192.png">
+
+  <!-- Mobil‑CSS -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- QR‑kod‑lib för gåta 5 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>Chiffer‑utmaning</h1>
+    <div id="timer" aria-live="polite">00:00</div>
+  </header>
+  <main id="app"></main>
+
+  <!-- Rätt/fel‑ljud -->
+  <audio id="audio-correct" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="audio-wrong"   src="assets/wrong.mp3"   preload="auto"></audio>
+
+  <!-- Spel‑logik -->
+  <script src="script.js"></script>
+</body>
+</html>
