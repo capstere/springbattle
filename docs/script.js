@@ -6,24 +6,24 @@ const puzzles = [
     type: 'text'
   },
   {
-    prompt: '2: Tajma svaret med primtalet',
+    prompt: '2: Ange talet bakom mörkret',
     answer: '17',
     type: 'stego',
     img: 'assets/stego.png'
   },
   {
-    prompt: '3: Vilken sång hör du?',
+    prompt: '3: Ange sångtitel',
     answer: 'editpir',
     type: 'audio',
     src: 'assets/p3-chorus-rev.mp3'
   },
   {
-    prompt: '4: Primtal – skriv aktuell minut om den är ett primtal',
+    prompt: '4: Tajma svar med primtal',
     answer: null, // beräknas dynamiskt
     type: 'prime'
   },
   {
-    prompt: '5: QR – scanna koden för att få ordet',
+    prompt: '5:  Ange ordet.',
     answer: 'kramp',
     type: 'qr',
     data: 'kramp'
