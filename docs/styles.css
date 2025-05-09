@@ -1,27 +1,26 @@
+/* Grundfärger */
 :root {
-  --brand: #0066cc;
-  --bg: #f8f8f8;
-  --text: #222;
-  --card-bg: #fff;
+  --bg: #3B682D;
+  --fg: #fff;
+  --control-bg: #F1FBC1;
+  --control-fg: #000;
+  --card-bg: rgba(255,255,255,0.1);
   --radius: 8px;
+  --brand: #F1FBC1;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
-  margin: 0;
+  margin:0;
   font-family: -apple-system, Roboto, sans-serif;
   background: var(--bg);
-  color: var(--text);
+  color: var(--fg);
 }
 
 header {
-  background: var(--brand);
-  color: white;
-  text-align: center;
   padding: 1rem;
+  text-align: center;
 }
 
 header h1 {
@@ -42,32 +41,29 @@ main {
   background: var(--card-bg);
   border-radius: var(--radius);
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   margin-bottom: 1rem;
 }
 
-.card .prompt {
-  font-size: 1.1rem;
+.prompt {
   margin-bottom: 0.75rem;
+  font-size: 1.1rem;
 }
 
-input {
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: var(--radius);
-}
-
+input,
 button {
+  display: block;
   width: 100%;
   padding: 0.75rem;
   font-size: 1rem;
-  margin-top: 0.75rem;
-  background: var(--brand);
-  color: white;
+  margin-top: 0.5rem;
   border: none;
   border-radius: var(--radius);
+  background: var(--control-bg);
+  color: var(--control-fg);
+}
+
+input::placeholder {
+  color: var(--control-fg);
 }
 
 button:active {
@@ -75,7 +71,6 @@ button:active {
 }
 
 img {
-  display: block;
   width: 100%;
   border-radius: var(--radius);
   margin: 0.5rem 0;
