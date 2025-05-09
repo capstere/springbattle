@@ -1,4 +1,3 @@
-/* Grundfärger */
 :root {
   --bg: #3B682D;
   --fg: #fff;
@@ -6,7 +5,6 @@
   --control-fg: #000;
   --card-bg: rgba(255,255,255,0.1);
   --radius: 8px;
-  --brand: #F1FBC1;
 }
 
 * { box-sizing: border-box; }
@@ -19,64 +17,38 @@ body {
 }
 
 header {
-  padding: 1rem;
-  text-align: center;
+  text-align:center; padding:1rem;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 1.5rem;
-}
+header h1 { margin:0; font-size:1.5rem; }
+#timer { margin-top:.5rem; font-size:1.25rem; }
 
-#timer {
-  margin-top: 0.5rem;
-  font-size: 1.25rem;
-}
-
-main {
-  padding: 1rem;
-}
+main { padding:1rem; }
 
 .card {
   background: var(--card-bg);
   border-radius: var(--radius);
-  padding: 1rem;
-  margin-bottom: 1rem;
+  padding:1rem;
+  margin-bottom:1rem;
 }
 
-.prompt {
-  margin-bottom: 0.75rem;
-  font-size: 1.1rem;
-}
+.prompt { font-size:1.1rem; margin-bottom:.75rem; }
 
-input,
-button {
-  display: block;
-  width: 100%;
-  padding: 0.75rem;
-  font-size: 1rem;
-  margin-top: 0.5rem;
-  border: none;
-  border-radius: var(--radius);
+input, button {
+  width:100%; padding:.75rem; font-size:1rem;
+  margin-top:.5rem; border:none; border-radius:var(--radius);
   background: var(--control-bg);
   color: var(--control-fg);
 }
 
 input::placeholder {
-  color: var(--control-fg);
+  color: rgba(0,0,0,0.5); /* grå fadead */
 }
 
-button:active {
-  opacity: 0.8;
-}
+button:active { opacity:.8; }
 
 img {
-  width: 100%;
-  border-radius: var(--radius);
-  margin: 0.5rem 0;
+  width:100%; border-radius:var(--radius); margin: .5rem 0;
 }
 
-#qrcode {
-  text-align: center;
-  margin: 0.5rem 0;
-}
+#qrcode { text-align:center; margin:.5rem 0; }
