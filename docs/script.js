@@ -6,24 +6,24 @@ const puzzles = [
     type: 'text'
   },
   {
-    prompt: '2: Ange nummer',
+    prompt: '2: Tajma svaret med primtalet',
     answer: '17',
     type: 'stego',
     img: 'assets/stego.png'
   },
   {
-    prompt: '3: Ange låt-titel',
+    prompt: '3: Vilken sång hör du?',
     answer: 'editpir',
     type: 'audio',
     src: 'assets/p3-chorus-rev.mp3'
   },
   {
-    prompt: 'Gåta 4: Tajma svaret med primtalet',
+    prompt: '4: Primtal – skriv aktuell minut om den är ett primtal',
     answer: null, // beräknas dynamiskt
     type: 'prime'
   },
   {
-    prompt: 'Gåta 5: QR – scanna koden för att få ordet',
+    prompt: '5: QR – scanna koden för att få ordet',
     answer: 'kramp',
     type: 'qr',
     data: 'kramp'
@@ -31,115 +31,121 @@ const puzzles = [
 ];
 
 // --- GLOBALA VARIABLER ---
-let current=0, startTime=null, timerId=null;
-const app=document.getElementById('app'),
-      timerEl=document.getElementById('timer'),
-      audioC=document.getElementById('audio-correct'),
-      audioW=document.getElementById('audio-wrong');
-const audioCtx = new (window.AudioContext||window.webkitAudioContext)();
-let currentAudioSource = null;
+let current = 0,
+    startTime = null,
+    timerId = null;
+
+const app       = document.getElementById('app'),
+      timerEl   = document.getElementById('timer'),
+      audioC    = document.getElementById('audio-correct'),
+      audioW    = document.getElementById('audio-wrong');
+
+const audioCtx           = new (window.AudioContext||window.webkitAudioContext)(),
+      bufferSources = { puzzle: null };
 
 // --- INIT ---
 window.onload = () => {
-  const saved = localStorage.getItem('chiffer_start');
-  const idx   = localStorage.getItem('chiffer_current');
+  const saved = localStorage.getItem('chiffer_start'),
+        idx   = localStorage.getItem('chiffer_current');
   if (saved) {
     startTime = +saved;
-    timerId = setInterval(updateTimer,500);
-    showPuzzle(idx?+idx:0);
+    timerId   = setInterval(updateTimer, 500);
+    showPuzzle(idx ? +idx : 0);
   } else {
     renderIntro();
   }
 };
 
 // --- RENDER INTRO ---
-function renderIntro(){
+function renderIntro() {
   clearInterval(timerId);
   localStorage.removeItem('chiffer_start');
   localStorage.removeItem('chiffer_current');
-  timerEl.textContent='00:00';
-  app.innerHTML=`
+  timerEl.textContent = '00:00';
+  app.innerHTML = `
     <div class="card">
-      <p>Välkommen till VÅRKAMP online!</p>
+       <p>Välkommen till VÅRKAMP online!</p>
       <button id="start">Starta VÅRKAMP<sup>5</sup></button>
     </div>`;
   document.getElementById('start').onclick = () => {
     startTime = Date.now();
     localStorage.setItem('chiffer_start', startTime);
     localStorage.setItem('chiffer_current', '0');
-    timerId = setInterval(updateTimer,500);
+    timerId = setInterval(updateTimer, 500);
     showPuzzle(0);
   };
 }
 
 // --- TIMER ---
-function updateTimer(){
-  const diff=Date.now()-startTime,
-        m=Math.floor(diff/60000),
-        s=Math.floor((diff%60000)/1000),
-        mm=String(m).padStart(2,'0'),
-        ss=String(s).padStart(2,'0');
-  timerEl.textContent=`${mm}:${ss}`;
+function updateTimer() {
+  const diff = Date.now() - startTime,
+        m    = Math.floor(diff / 60000),
+        s    = Math.floor((diff % 60000) / 1000),
+        mm   = String(m).padStart(2, '0'),
+        ss   = String(s).padStart(2, '0');
+  timerEl.textContent = `${mm}:${ss}`;
 }
 
 // --- VISA GÅTA ---
-function showPuzzle(i){
-  current=i;
-  localStorage.setItem('chiffer_current',String(i));
-  const p=puzzles[i];
-  app.innerHTML=`<div class="card"><div class="prompt">${p.prompt}</div></div>`;
+function showPuzzle(i) {
+  current = i;
+  localStorage.setItem('chiffer_current', String(i));
+  const p = puzzles[i];
+  app.innerHTML = `<div class="card"><div class="prompt">${p.prompt}</div></div>`;
   const card = app.querySelector('.card');
 
   // Stego
-  if(p.type==='stego'){
-    const img=document.createElement('img');
-    img.src=p.img; img.style.filter='brightness(0)';
-    img.onclick=()=>img.style.filter='';
+  if (p.type === 'stego') {
+    const img = document.createElement('img');
+    img.src = p.img; img.style.filter = 'brightness(0)';
+    img.onclick = () => img.style.filter = '';
     card.appendChild(img);
   }
 
   // Audio‑reverse
-  if(p.type==='audio'){
-    fetch(p.src).then(r=>r.arrayBuffer()).then(buf=>{
-      audioCtx.decodeAudioData(buf,decoded=>{
-        // vänd tillbaka
+  if (p.type === 'audio') {
+    fetch(p.src)
+      .then(r => r.arrayBuffer())
+      .then(raw => audioCtx.decodeAudioData(raw))
+      .then(decoded => {
         decoded.getChannelData(0).reverse();
-        playBuffer(decoded);
+        playPuzzleAudio(decoded);
         addReplayButton(decoded);
       });
-    });
   }
 
-  // Prime
-  if(p.type==='prime'){
-    // inget extra element
-  }
-
+  // Prime (ingen extra UI)
   // QR
-  if(p.type==='qr'){
-    const div=document.createElement('div');
-    div.id='qrcode'; card.appendChild(div);
-    new QRCode(div,{text:p.data,width:150,height:150});
+  if (p.type === 'qr') {
+    const div = document.createElement('div');
+    div.id = 'qrcode'; card.appendChild(div);
+    new QRCode(div, { text: p.data, width: 150, height: 150 });
   }
 
   // Input + knapp
-  const inp=document.createElement('input');
-  inp.id='ans'; inp.placeholder='Svara här';
-  const btn=document.createElement('button');
-  btn.textContent='Skicka';
-  card.append(inp,btn);
+  const inp = document.createElement('input');
+  inp.id = 'ans';
+  inp.placeholder = 'Svara här';
+  const btn = document.createElement('button');
+  btn.textContent = 'Skicka';
+  card.append(inp, btn);
 
-  btn.onclick = ()=>{
-    let ans=inp.value.trim().toLowerCase();
-    if(p.type==='prime'){
-      const m=Math.floor((Date.now()-startTime)/60000);
-      p.answer = isPrime(m)?m:null;
+  btn.onclick = () => {
+    // Stoppa puzzle-ljud vid svar
+    stopPuzzleAudio();
+
+    let ans = inp.value.trim().toLowerCase();
+    if (p.type === 'prime') {
+      const m = Math.floor((Date.now() - startTime) / 60000);
+      p.answer = isPrime(m) ? m : null;
     }
-    if(String(ans)===String(p.answer)){
+    if (String(ans) === String(p.answer)) {
+      audioC.currentTime = 0;
       audioC.play();
-      if(i+1<puzzles.length) showPuzzle(i+1);
+      if (i + 1 < puzzles.length) showPuzzle(i + 1);
       else finish();
     } else {
+      audioW.currentTime = 0;
       audioW.play();
       alert('Fel – försök igen!');
     }
@@ -147,38 +153,48 @@ function showPuzzle(i){
 }
 
 // --- AVSLUTA ---
-function finish(){
+function finish() {
   clearInterval(timerId);
   localStorage.removeItem('chiffer_start');
   localStorage.removeItem('chiffer_current');
-  app.innerHTML=`
+  stopPuzzleAudio();
+  app.innerHTML = `
     <div class="card">
-      <h2>KUL!</h2>
-      <p>Viska slutlösenordet till domare: <strong>KRAMP123</strong></p>
+      <h2>Grattis!</h2>
+      <p>Slutlösenordet är: <strong>KRAMP123</strong></p>
     </div>`;
 }
 
-// --- HJÄLP: spela buffer och stopp/start ---
-function playBuffer(buf){
-  if(currentAudioSource){
-    try{ currentAudioSource.stop(); }catch(e){}
-  }
-  const src=audioCtx.createBufferSource();
-  src.buffer=buf;
+// --- LJUDHANTERING ---
+function playPuzzleAudio(buffer) {
+  stopPuzzleAudio();
+  const src = audioCtx.createBufferSource();
+  src.buffer = buffer;
   src.connect(audioCtx.destination);
   src.start();
-  currentAudioSource=src;
+  bufferSources.puzzle = src;
 }
-function addReplayButton(buf){
-  const btn=document.createElement('button');
-  btn.textContent='⏪ Spela om';
-  btn.onclick=()=>playBuffer(buf);
+
+function addReplayButton(buffer) {
+  const btn = document.createElement('button');
+  btn.textContent = '⏪ Spela om';
+  btn.onclick = () => playPuzzleAudio(buffer);
   app.querySelector('.card').appendChild(btn);
 }
 
-// --- HJÄLP: primtalstest ---
-function isPrime(n){
-  if(n<2) return false;
-  for(let i=2;i*i<=n;i++) if(n%i===0) return false;
+function stopPuzzleAudio() {
+  const src = bufferSources.puzzle;
+  if (src) {
+    try { src.stop(); } catch (_) {}
+    bufferSources.puzzle = null;
+  }
+}
+
+// --- PRIMTALSHJÄLP ---
+function isPrime(n) {
+  if (n < 2) return false;
+  for (let i = 2; i * i <= n; i++) {
+    if (n % i === 0) return false;
+  }
   return true;
 }
